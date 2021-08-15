@@ -2,55 +2,50 @@
 import { defineComponent, reactive, computed } from 'vue'
 import { useMouse, templateRef, useRafFn, useWindowSize } from '@vueuse/core'
 import useElementBounds from './composables/useElementBounds'
-import { clamp, flipP, lerp, valToP } from './utils/functions'
-import { calcHypotenuse } from './utils/geometry'
-import getIntersection from './utils/intersection'
+import { lerp } from './utils/functions'
+import { ellipseScale, rectScale } from './utils/geometry'
 
 export default defineComponent({
 	name: 'GooeyBackground',
 	inheritAttrs: false,
 	props: {
 		disabled: { type: Boolean, default: false },
+		ellipse: { type: Boolean, default: false },
 	},
 	setup(props) {
 		const background = templateRef<HTMLDivElement | null>('background')
-		const dot = templateRef<HTMLDivElement | null>('dot')
+		const ball = templateRef<HTMLDivElement | null>('ball')
 		const mouse = reactive(useMouse({ touch: false }))
 		const bounds = useElementBounds(background, { width: 80, height: 40 })
 		const { width: vw } = useWindowSize()
 
-		const targetDotpoz = computed(() => ({
+		const targetBallPoz = computed(() => ({
 			left: mouse.x - bounds.left,
 			top: mouse.y - bounds.top,
 		}))
 
-		const dotpoz = {
+		const ballPoz = {
 			left: 0,
 			top: 0,
 		}
 
+		// Request Animation Frame
 		useRafFn(() => {
-			if (props.disabled || !dot.value || vw.value < 624) return
-			dotpoz.left = lerp(dotpoz.left, targetDotpoz.value.left, 0.2)
-			dotpoz.top = lerp(dotpoz.top, targetDotpoz.value.top, 0.2)
+			if (props.disabled || !ball.value || vw.value < 624) return
+			ballPoz.left = lerp(ballPoz.left, targetBallPoz.value.left, 0.2)
+			ballPoz.top = lerp(ballPoz.top, targetBallPoz.value.top, 0.2)
 
 			const fromCenter = {
-				x: dotpoz.left - bounds.width / 2,
-				y: -(dotpoz.top - bounds.height / 2),
+				x: ballPoz.left - bounds.width / 2,
+				y: -(ballPoz.top - bounds.height / 2),
 			}
-			const intersection = getIntersection(
-				fromCenter.x,
-				fromCenter.y,
-				bounds.width / 2,
-				bounds.height / 2,
-			)
-			const r = calcHypotenuse(fromCenter.x, fromCenter.y)
-			const minR = calcHypotenuse(intersection.x, intersection.y) - 12
-			const maxR = minR + 40
-			const p = flipP(clamp(valToP(r, minR, maxR), 0, 1))
 
-			dot.value.style.transform = `translate(${dotpoz.left}px, ${dotpoz.top}px) scale(${p})`
-			// dot.value.style.opacity = p + ''
+			const p = props.ellipse
+				? ellipseScale(fromCenter, bounds)
+				: rectScale(fromCenter, bounds)
+
+			ball.value.style.transform = `translate(${ballPoz.left}px, ${ballPoz.top}px) scale(${p})`
+			// ball.value.style.opacity = p + ''
 		})
 	},
 })
@@ -60,7 +55,7 @@ export default defineComponent({
 	<div v-bind="$attrs" class="gooey-background wrapper" :class="{ disabled }">
 		<slot></slot>
 		<div class="gooey-group">
-			<div ref="dot" class="dot"></div>
+			<div ref="ball" class="ball"></div>
 			<div ref="background" class="background"></div>
 		</div>
 	</div>
@@ -100,7 +95,7 @@ export default defineComponent({
 	position: relative;
 	--bg-color: #42b883;
 	--bg-radius: 12px;
-	--dot-size: 52px;
+	--ball-size: 52px;
 }
 
 .gooey-group {
@@ -109,15 +104,15 @@ export default defineComponent({
 	z-index: -1;
 	@include inset;
 }
-.dot {
+.ball {
 	position: absolute;
 	pointer-events: none;
 	z-index: -1;
 	top: 0;
 	left: 0;
-	width: var(--dot-size);
-	height: var(--dot-size);
-	margin: calc(var(--dot-size) / -2) 0 0 calc(var(--dot-size) / -2);
+	width: var(--ball-size);
+	height: var(--ball-size);
+	margin: calc(var(--ball-size) / -2) 0 0 calc(var(--ball-size) / -2);
 	background: var(--bg-color);
 	border-radius: 50%;
 
@@ -126,7 +121,7 @@ export default defineComponent({
 	}
 }
 
-.disabled .dot {
+.disabled .ball {
 	display: none;
 }
 
