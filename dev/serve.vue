@@ -51,8 +51,13 @@ body {
 		--bg-color: black;
 	}
 
-	// &.example-3 {
-
-	// }
+	&.example-4 {
+		--bg-color: #f39740;
+		--duration: 200ms;
+		--ease: ease;
+		&:hover {
+			--bg-color: #df8339;
+		}
+	}
 }
 </style>

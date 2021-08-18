@@ -107,6 +107,8 @@ export default defineComponent({
 	--bg-color: #42b883;
 	--bg-radius: 12px;
 	--ball-size: 52px;
+	--duration: 300ms;
+	--ease: cubic-bezier(0.51, 0.06, 0.56, 1.37);
 }
 
 .gooey-group {
@@ -126,6 +128,7 @@ export default defineComponent({
 	margin: calc(var(--ball-size) / -2) 0 0 calc(var(--ball-size) / -2);
 	background: var(--bg-color);
 	border-radius: 50%;
+	transition: background var(--duration) var(--ease);
 }
 .isMobile .ball {
 	display: none;
@@ -139,6 +142,7 @@ export default defineComponent({
 	@include inset;
 	background: var(--bg-color);
 	border-radius: var(--bg-radius);
+	transition: background var(--duration) var(--ease);
 }
 
 .svg-filter {
