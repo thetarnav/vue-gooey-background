@@ -13,10 +13,21 @@ export default defineComponent({
 </script>
 
 <template>
-	<gooey-background class="example example-1">Hello</gooey-background>
-	<gooey-background class="example example-2">Example BOX</gooey-background>
-	<gooey-background class="example example-3" disabled>Hello</gooey-background>
-	<gooey-background class="example example-4">Hello</gooey-background>
+	<gooey-background class="example example-1">
+		Welcome to
+	</gooey-background>
+
+	<gooey-background class="example example-2">
+		vue-gooey-background
+	</gooey-background>
+
+	<gooey-background class="example example-3" disabled>
+		Disabled :(
+	</gooey-background>
+
+	<gooey-background class="example example-4">
+		With hover
+	</gooey-background>
 </template>
 
 <style lang="scss">
@@ -27,6 +38,7 @@ body {
 	height: 100vw;
 	overflow-x: hidden;
 	overflow-y: scroll;
+	font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 #app {
 	margin: 100px auto;
