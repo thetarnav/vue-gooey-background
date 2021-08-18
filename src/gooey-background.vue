@@ -1,9 +1,10 @@
 <script lang="ts">
 import { defineComponent, reactive, computed } from 'vue'
-import { useMouse, templateRef, useRafFn, useWindowSize } from '@vueuse/core'
+import { useMouse, templateRef, useRafFn } from '@vueuse/core'
 import useElementBounds from './composables/useElementBounds'
 import { lerp } from './utils/functions'
 import { ellipseScale, rectScale } from './utils/geometry'
+import { isMobile } from 'mobile-device-detect'
 
 export default defineComponent({
 	name: 'GooeyBackground',
@@ -17,7 +18,6 @@ export default defineComponent({
 		const ball = templateRef<HTMLDivElement | null>('ball')
 		const mouse = reactive(useMouse({ touch: false }))
 		const bounds = useElementBounds(background, { width: 80, height: 40 })
-		const { width: vw } = useWindowSize()
 
 		const targetBallPoz = computed(() => ({
 			left: mouse.x - bounds.left,
@@ -30,8 +30,8 @@ export default defineComponent({
 		}
 
 		// Request Animation Frame
-		useRafFn(() => {
-			if (props.disabled || !ball.value || vw.value < 624) return
+		const raf = useRafFn(() => {
+			if (props.disabled || !ball.value) return
 			ballPoz.left = lerp(ballPoz.left, targetBallPoz.value.left, 0.2)
 			ballPoz.top = lerp(ballPoz.top, targetBallPoz.value.top, 0.2)
 
@@ -47,12 +47,23 @@ export default defineComponent({
 			ball.value.style.transform = `translate(${ballPoz.left}px, ${ballPoz.top}px) scale(${p})`
 			// ball.value.style.opacity = p + ''
 		})
+
+		// Stop RAF immediately if on mobile device.
+		isMobile && raf.pause()
+
+		return {
+			isMobile,
+		}
 	},
 })
 </script>
 
 <template>
-	<div v-bind="$attrs" class="gooey-background wrapper" :class="{ disabled }">
+	<div
+		v-bind="$attrs"
+		class="gooey-background wrapper"
+		:class="{ disabled, isMobile }"
+	>
 		<slot></slot>
 		<div class="gooey-group">
 			<div ref="ball" class="ball"></div>
@@ -115,12 +126,10 @@ export default defineComponent({
 	margin: calc(var(--ball-size) / -2) 0 0 calc(var(--ball-size) / -2);
 	background: var(--bg-color);
 	border-radius: 50%;
-
-	@media screen and (max-width: 624px) {
-		display: none;
-	}
 }
-
+.isMobile .ball {
+	display: none;
+}
 .disabled .ball {
 	display: none;
 }

@@ -1,4 +1,8 @@
-import { MaybeElementRef, useResizeObserver } from '@vueuse/core'
+import {
+	MaybeElementRef,
+	useResizeObserver,
+	useEventListener,
+} from '@vueuse/core'
 import { onMounted, reactive } from 'vue'
 
 interface Bounds {
@@ -27,6 +31,7 @@ export default function useElementBounds(
 		Object.assign(bounds, { left, top, width, height })
 	}
 	useResizeObserver(target, setElementBounds)
+	useEventListener(window, 'resize', setElementBounds)
 	onMounted(setElementBounds)
 
 	return bounds
