@@ -1,8 +1,8 @@
-﻿# Vue Gooey Background
+# Vue Gooey Background
 
 Gooey Background Component for Vue 3.
 
-See the [DEMO](https://vue-hcyeqk.stackblitz.io) on StackBlitz.
+See the [DEMO](https://stackblitz.com/edit/vue-hcyeqk?file=src/App.vue) on StackBlitz.
 
 ## Install
 
