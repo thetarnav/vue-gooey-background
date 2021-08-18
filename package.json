@@ -68,5 +68,13 @@
   },
   "engines": {
     "node": ">=12"
-  }
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "goo",
+    "gooey",
+    "fluid",
+    "sfc"
+  ]
 }
